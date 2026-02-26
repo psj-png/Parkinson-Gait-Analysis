@@ -2,86 +2,69 @@ import os
 import sys
 import cv2
 import pandas as pd
+import numpy as np
 from tqdm import tqdm
+# [중요] utils.py에서 필터 함수들을 가져옵니다.
+from utils import remove_outliers, apply_moving_average, apply_butterworth_filter
 
-# [보안책] 경로 꼬임 방지
-if os.getcwd() in sys.path:
-    sys.path.remove(os.getcwd())
 
-# 1. MediaPipe 로드
-try:
-    import mediapipe as mp
-
-    try:
-        mp_pose = mp.solutions.pose
-    except AttributeError:
-        from mediapipe.python.solutions import pose as mp_pose
-
-    pose = mp_pose.Pose(
-        static_image_mode=False,
-        min_detection_confidence=0.5,
-        model_complexity=1
-    )
-    print("✅ [성공] MediaPipe 관절 모델이 준비되었습니다.")
-
-except Exception as e:
-    print(f"❌ [치명적 오류] 라이브러리 로드 실패: {e}")
-    sys.exit()
-
-# 2. 경로 설정
-BASE_PATH = r'C:\Gait_Analysis'
-DATA_DIR = os.path.join(BASE_PATH, 'data')
-OUTPUT_DIR = os.path.join(BASE_PATH, 'extracted_data')
-
-if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
-
+# ... (MediaPipe 로드 및 경로 설정 부분은 동일) ...
 
 def run_extraction():
     all_rows = []
-
-    # [수정] data 폴더 내의 모든 하위 폴더를 자동으로 탐색합니다.
     target_categories = [d for d in os.listdir(DATA_DIR) if os.path.isdir(os.path.join(DATA_DIR, d))]
-
-    print(f"📂 분석 대상 폴더 발견: {target_categories}")
 
     for category in target_categories:
         cat_path = os.path.join(DATA_DIR, category)
-        # 지원하는 모든 영상 및 GIF 확장자 포함
         videos = [f for f in os.listdir(cat_path) if f.lower().endswith(('.mp4', '.avi', '.gif', '.mov'))]
-
-        if not videos:
-            continue
-
-        print(f"\n🎬 [{category}] 작업 시작 (총 {len(videos)}개 파일)")
 
         for v_name in tqdm(videos):
             v_path = os.path.join(cat_path, v_name)
             cap = cv2.VideoCapture(v_path)
+
+            # --- [수정] 영상 하나당 데이터를 임시로 모을 리스트 ---
+            temp_video_data = []
             f_idx = 0
 
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret: break
 
-                # 이미지 처리
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 res = pose.process(rgb)
 
                 if res.pose_landmarks:
-                    # 기본 정보 (영상명, 라벨, 프레임 번호)
-                    data = {'video': v_name, 'label': category, 'frame': f_idx}
-
-                    # 33개 관절의 x, y, z, 신뢰도(v) 추출
+                    frame_data = {'video': v_name, 'label': category, 'frame': f_idx}
                     for i, lm in enumerate(res.pose_landmarks.landmark):
-                        data[f'j{i}_x'] = lm.x
-                        data[f'j{i}_y'] = lm.y
-                        data[f'j{i}_z'] = lm.z
-                        data[f'j{i}_v'] = lm.visibility  # AI 인식 신뢰도 포함
-
-                    all_rows.append(data)
+                        frame_data[f'j{i}_x'] = lm.x
+                        frame_data[f'j{i}_y'] = lm.y
+                        frame_data[f'j{i}_z'] = lm.z
+                        frame_data[f'j{i}_v'] = lm.visibility
+                    temp_video_data.append(frame_data)
                 f_idx += 1
             cap.release()
+
+            # --- [핵심: 3단계 노이즈 제거 적용] ---
+            if len(temp_video_data) > 10:  # 최소 프레임 이상일 때만 필터링
+                df_temp = pd.DataFrame(temp_video_data)
+
+                # 모든 관절 좌표(x, y, z)에 대해 필터 적용
+                for i in range(33):
+                    for axis in ['x', 'y', 'z']:
+                        col = f'j{i}_{axis}'
+                        # 1단계: Outlier 제거 -> 2단계: Moving Average -> 3단계: Butterworth
+                        data = df_temp[col].values
+                        data = remove_outliers(data)
+                        data = apply_moving_average(data)
+                        # 버터워스는 데이터 길이가 충분할 때만 (순서 주의)
+                        data = apply_butterworth_filter(data)
+
+                        # 필터링된 데이터를 다시 프레임 수에 맞게 할당
+                        # (필터 특성상 길이가 줄어들 수 있으므로 보간 처리 필요할 수 있음)
+                        df_temp[col] = pd.Series(data).reindex(df_temp.index).interpolate().bfill()
+
+                # 정제된 데이터를 전체 리스트에 통합
+                all_rows.extend(df_temp.to_dict('records'))
 
     # 3. 결과 통합 저장
     if all_rows:
