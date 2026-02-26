@@ -2,44 +2,44 @@ import cv2
 import os
 import shutil
 import numpy as np
+from scipy.signal import butter, filtfilt  # 버터워스 필터용
 
-# [최강 우회 전략]
-try:
-    import mediapipe as mp
+# ... (MediaPipe 로드 부분은 상준 님 기존 코드와 동일) ...
 
-    mp_pose = mp.solutions.pose
-    print("✅ 방법 1: mp.solutions 로드 성공")
-except Exception:
-    try:
-        from mediapipe.python.solutions import pose as mp_pose
+# --- [신규 추가: 3단계 노이즈 제거 함수들] ---
 
-        print("✅ 방법 2: mediapipe.python.solutions 로드 성공")
-    except Exception as e:
-        print(f"❌ 모든 방법 실패. 에러 내용: {e}")
-        exit()
+def moving_average(data, window_size=5):
+    """1단계: Jittering 제거를 위한 이동 평균 필터"""
+    if len(data) < window_size:
+        return data
+    return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
 
-# 1. 설정
-input_folder = "gavd_data_1"
-output_base = "classified_videos"
-categories = ["Pure_Lateral", "Valid_Oblique", "Frontal", "Error_Noise"]
+def remove_outliers(data, threshold=2.0):
+    """2단계: 갑자기 튀는 값(Outlier) 제거 및 보간"""
+    data = np.array(data)
+    mean = np.mean(data)
+    std = np.std(data)
+    # 평균에서 2표준편차 이상 벗어나면 아웃라이어로 간주
+    is_outlier = np.abs(data - mean) > threshold * std
+    data[is_outlier] = mean  # 간단하게 평균값으로 대체 (보간)
+    return data
 
-for cat in categories:
-    os.makedirs(os.path.join(output_base, cat), exist_ok=True)
+def butter_lowpass_filter(data, cutoff=3.0, fs=30, order=2):
+    """3단계: 데이터 스무딩을 위한 버터워스 저주파 필터"""
+    if len(data) <= order * 3: return data # 데이터가 너무 짧으면 패스
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    b, a = butter(order, normal_cutoff, btype='low', analog=False)
+    return filtfilt(b, a, data)
 
-# Pose 객체 생성
-pose_detector = mp_pose.Pose(
-    static_image_mode=False,
-    min_detection_confidence=0.5,
-    model_complexity=1
-)
-
+# ----------------------------------------------
 
 def get_view_angle(video_path):
     cap = cv2.VideoCapture(video_path)
-    widths = []
+    raw_widths = []  # 날것의 데이터
     frame_count = 0
 
-    while cap.isOpened() and frame_count < 45:
+    while cap.isOpened() and frame_count < 60: # 노이즈 제거를 위해 프레임을 조금 더 확보(45->60)
         success, image = cap.read()
         if not success: break
 
@@ -48,40 +48,22 @@ def get_view_angle(video_path):
 
         if results.pose_landmarks:
             lm = results.pose_landmarks.landmark
-            # 어깨 너비 계산
+            # 11: 왼쪽 어깨, 12: 오른쪽 어깨
             shoulder_width = abs(lm[11].x - lm[12].x)
-            widths.append(shoulder_width)
-
+            raw_widths.append(shoulder_width)
         frame_count += 1
-
     cap.release()
-    return np.mean(widths) if widths else None
 
+    if not raw_widths: return None
 
-# 2. 실행
-print("🚀 시점 분류를 시작합니다...")
-if not os.path.exists(input_folder):
-    print(f"❌ 폴더 없음: {input_folder}")
-else:
-    files = [f for f in os.listdir(input_folder) if f.endswith(('.mp4', '.avi', '.mov'))]
-    for video in files:
-        path = os.path.join(input_folder, video)
-        avg_w = get_view_angle(path)
+    # --- [데이터 정제 프로세스 적용] ---
+    # 1. 아웃라이어 제거
+    clean_data = remove_outliers(raw_widths)
+    # 2. 이동 평균 적용 (지터링 감소)
+    ma_data = moving_average(clean_data, window_size=5)
+    # 3. 버터워스 필터 적용 (최종 스무딩)
+    final_data = butter_lowpass_filter(ma_data)
 
-        if avg_w is None:
-            target = "Error_Noise"
-        elif avg_w < 0.12:
-            target = "Pure_Lateral"
-        elif 0.12 <= avg_w < 0.30:
-            target = "Valid_Oblique"
-        elif 0.30 <= avg_w < 0.50:
-            target = "Error_Noise"
-        else:
-            target = "Frontal"
+    return np.mean(final_data) 
 
-        # [수정된 출력부]
-        val_display = f"{avg_w:.3f}" if avg_w is not None else "N/A"
-        print(f"🎬 {video} [{val_display}] -> {target}")
-        shutil.copy(path, os.path.join(output_base, target, video))
-
-print("\n✨ 모든 작업이 완료되었습니다! 'classified_videos' 폴더를 확인하세요.")
+# ... (이하 분류 로직 및 출력부는 상준 님 기존 코드와 동일) ...
