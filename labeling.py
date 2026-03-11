@@ -6,14 +6,12 @@ import os
 def calculate_angle(a, b, c):
     """세 점을 이용해 관절 각도를 계산합니다."""
     a, b, c = np.array(a), np.array(b), np.array(c)
-    # 벡터 연산을 통한 각도 산출
     rad = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
     angle = np.abs(rad * 180.0 / np.pi)
     return angle if angle <= 180.0 else 360 - angle
 
 
 if __name__ == "__main__":
-    # 1. 2단계에서 추출한 통합 데이터 불러오기
     input_path = r'C:\Gait_Analysis\extracted_data\gait_integrated_data.csv'
     output_path = r'C:\Gait_Analysis\extracted_data\gait_cleaned_labeled.csv'
 
@@ -21,34 +19,48 @@ if __name__ == "__main__":
         print(f"❌ 파일을 찾을 수 없습니다: {input_path}")
     else:
         df = pd.read_csv(input_path)
-
-        # 2. 불필요한 영상 데이터 필터링 (제미나이, 멈추는 등 분석 방해 요소 제거)
         df = df[~df['video'].str.contains('멈추는|제미나이')].copy()
 
-
-        # 3. 임상 지표(무릎 각도, 상체 기울기) 계산 함수
-        def get_clinical(row):
-            # 무릎 각도 (골반-무릎-발목)
-            k = calculate_angle([row.j23_x, row.j23_y], [row.j25_x, row.j25_y], [row.j27_x, row.j27_y])
-            # 상체 기울기 (어깨-골반-수직선)
-            t = calculate_angle([row.j11_x, row.j11_y], [row.j23_x, row.j23_y], [row.j23_x, 0])
-            return pd.Series([k, t])
+        print("🔄 4대 보행 지표(ROM, Lean, Symmetry, Rhythm) 산출 중...")
 
 
-        print("🔄 임상 지표(Knee Angle, Trunk Lean) 계산 중...")
-        df[['knee_angle', 'trunk_lean']] = df.apply(get_clinical, axis=1)
+        # 1. 프레임별 각도 및 대칭성 계산
+        def get_gait_features(row):
+            # [기존] 왼쪽 무릎 각도
+            left_k = calculate_angle([row.j23_x, row.j23_y], [row.j25_x, row.j25_y], [row.j27_x, row.j27_y])
+            # [추가] 오른쪽 무릎 각도 (대칭성 판단용)
+            right_k = calculate_angle([row.j24_x, row.j24_y], [row.j26_x, row.j26_y], [row.j28_x, row.j28_y])
+            # [기존] 상체 기울기
+            trunk = calculate_angle([row.j11_x, row.j11_y], [row.j23_x, row.j23_y], [row.j23_x, 0])
 
-        # 4. Condition A 반영: 영상별 자동 진단 및 라벨링
-        # Future-proof 문법: include_groups=False를 사용하여 경고 제거
-        print("⚖️ 진단 기준(Condition A)에 따른 라벨링 수행 중...")
-        v_map = df.groupby('video').apply(
-            lambda x: '02_Parkinson' if x.knee_angle.min() < 150 or x.trunk_lean.max() > 10 else '01_Normal',
-            include_groups=False
-        )
+            # 보행 대칭성: 좌우 무릎 각도의 차이
+            symmetry_gap = abs(left_k - right_k)
 
-        df['label'] = df['video'].map(v_map)
+            return pd.Series([left_k, right_k, trunk, symmetry_gap])
 
-        # 5. 최종 결과 저장
-        df.to_csv(output_path, index=False, encoding='utf-8-sig')
-        print(f"✅ 라벨링 및 진단 완료! 파일 저장: {output_path}")
-        print(f"📊 정상 영상: {sum(v_map == '01_Normal')}개, 파킨슨 의심 영상: {sum(v_map == '02_Parkinson')}개")
+
+        df[['left_knee', 'right_knee', 'trunk_lean', 'symmetry_gap']] = df.apply(get_gait_features, axis=1)
+
+
+        # 2. 보행 리듬 규칙성 (Rhythm Variability) 계산
+        # 영상별로 무릎 각도의 변화 주기가 얼마나 일정한지(변동성) 산출
+        def calculate_rhythm(group):
+            # 무릎 각도가 변하는 속도(차이)의 표준편차를 규칙성 지표로 사용
+            rhythm_var = group['left_knee'].diff().std()
+            group['rhythm_variability'] = rhythm_var if pd.notnull(rhythm_var) else 0
+            return group
+
+
+        df = df.groupby('video', group_keys=False).apply(calculate_rhythm)
+
+        # 3. 하이브리드 진단을 위한 Condition A (Clinical 기준) 적용
+        # 무릎 가동성 부족 OR 상체 숙임 OR 대칭성 붕괴 OR 리듬 불규칙 중 하나라도 해당하면 의심
+        df['clinical_condition'] = (
+                (df['left_knee'] < 150) |
+                (df['trunk_lean'] > 10) |
+                (df['symmetry_gap'] > 15) |
+                (df['rhythm_variability'] > 5.0)
+        ).astype(int)
+
+        df.to_csv(output_path, index=False)
+        print(f"✅ 4대 지표 반영 및 라벨링 완료: {output_path}")
