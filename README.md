@@ -2,73 +2,100 @@
 
 Optical Flow + CNN (ResNet-18) + Grad-CAM 기반 보행 이상 이진 분류 파이프라인.
 
-## 파이프라인 구조
+## 파이프라인 완료 현황
+
+| 단계 | 스크립트 | 상태 | 결과 |
+|------|---------|------|------|
+| 1. Optical Flow 추출 | `01_extract_optical_flow.py` | 완료 | 2,190장 생성 |
+| 2. CNN 학습 | `02_train_cnn.py` | 완료 | Acc 72.38%, F1 0.724 |
+| 3. Grad-CAM 시각화 | `03_gradcam.py` | 완료 | 샘플 10장 생성 |
+| 4. 단일 영상 진단 | `04_diagnosis.py` | 완료 | Normal 98.73% / Abnormal 99.47% |
+
+## 폴더 구조
 
 ```
 data/
-  01_Normal/          원본 정상 보행 영상
-  02_Abnormal/        원본 이상 보행 영상
+  01_Normal/          원본 정상 보행 영상 (41개)
+  02_Abnormal/        원본 이상 보행 영상 (32개)
 
 output/
-  optical_flow/       Step 1 결과 (Farneback Optical Flow 이미지)
-    Normal/
-    Abnormal/
-  models/             Step 2 결과 (학습된 가중치 .pth)
-  results/            Step 3-4 결과 (Grad-CAM 시각화, 진단 리포트)
+  optical_flow/       Step 1 — Farneback Optical Flow 이미지
+    Normal/             영상당 30프레임 × 41개
+    Abnormal/           영상당 30프레임 × 32개
+  models/             Step 2 — 학습된 가중치 (cnn_best.pth)
+  results/
+    gradcam/          Step 3 — Grad-CAM 히트맵 샘플 (클래스별 5장)
+    diagnosis_*.json  Step 4 — 진단 리포트 (JSON)
 
 src/
-  01_extract_optical_flow.py   Optical Flow 추출
-  02_train_cnn.py              ResNet-18 학습
-  03_gradcam.py                Grad-CAM 시각화
-  04_diagnosis.py              단일 영상 진단
+  01_extract_optical_flow.py
+  02_train_cnn.py
+  03_gradcam.py
+  04_diagnosis.py
 
 archive/              이전 파이프라인 파일 백업
 ```
 
 ## 실행 순서
 
-### 1. Optical Flow 추출
+### Step 1. Optical Flow 추출
 ```bash
 python src/01_extract_optical_flow.py
 ```
-- `data/01_Normal`, `data/02_Abnormal`의 영상을 읽어 Farneback Optical Flow 이미지 추출
-- 영상당 30프레임, HSV 색상 맵으로 저장
-- 결과: `output/optical_flow/Normal/`, `output/optical_flow/Abnormal/`
+- Farneback Optical Flow → HSV 색상 맵으로 변환 후 저장
+- 영상당 30프레임 추출
+- 결과: `output/optical_flow/{Normal,Abnormal}/<영상명>/`
 
-### 2. CNN 학습
+### Step 2. CNN 학습
 ```bash
 python src/02_train_cnn.py
 ```
-- **영상 단위** 80/20 train/val 분리 (seed=42) — 동일 영상의 프레임이 train/val에 섞이지 않음
+- **영상 단위** 80/20 train/val 분리 (seed=42)
+  - 동일 영상의 프레임이 train/val에 섞이지 않아 데이터 누수 방지
 - ResNet-18 (ImageNet pretrained) fine-tuning
 - 매 에포크 Loss / Accuracy / F1 출력, 완료 시 classification report 자동 출력
 - 결과: `output/models/cnn_best.pth`
 
-### 3. Grad-CAM 시각화
+### Step 3. Grad-CAM 시각화
 ```bash
 python src/03_gradcam.py
 ```
-- 학습된 모델의 `layer4` 기준 Grad-CAM 히트맵 생성
-- 결과: `output/results/gradcam/`
+- `model.layer4` 기준 Grad-CAM 히트맵 생성
+- 각 클래스에서 비디오당 중간 프레임 1장 샘플링 (기본 클래스당 5장)
+- 파일명에 예측 클래스·신뢰도 포함 (`_predNormal_0.97.png`)
+- 결과: `output/results/gradcam/{Normal,Abnormal}/`
 
-### 4. 단일 영상 진단
+### Step 4. 단일 영상 진단
 ```bash
 python src/04_diagnosis.py --video <영상 경로>
 ```
-- 입력 영상에서 Optical Flow 추출 → 모델 추론 → JSON 리포트 저장
+- 입력 영상 → Optical Flow 추출 → 30프레임 평균 추론 → JSON 리포트 저장
 - 결과: `output/results/diagnosis_<영상명>.json`
 
-## 데이터셋
+## 진단 예시
 
-| 클래스 | 영상 수 | Optical Flow 이미지 수 |
-|--------|--------|----------------------|
-| Normal | 41 | 1,230 |
-| Abnormal | 32 | 960 |
-| **합계** | **73** | **2,190** |
+**Normal 영상** (`S01_Norm_S_01.mp4`)
+```json
+{
+  "prediction": "Normal",
+  "confidence": { "Abnormal": 0.0127, "Normal": 0.9873 },
+  "frames_analyzed": 30
+}
+```
+
+**Abnormal 영상** (`A01_Act_S_01.mp4`)
+```json
+{
+  "prediction": "Abnormal",
+  "confidence": { "Abnormal": 0.9947, "Normal": 0.0053 },
+  "frames_analyzed": 30
+}
+```
 
 ## 모델 평가 결과
 
 > ResNet-18, 20 epochs, video-level 80/20 split (seed=42)
+> Train: 59 videos (1,770 frames) / Val: 14 videos (420 frames)
 
 | 지표 | 값 |
 |------|-----|
@@ -78,17 +105,25 @@ python src/04_diagnosis.py --video <영상 경로>
 
 | 클래스 | Precision | Recall | F1 | Support |
 |--------|-----------|--------|----|---------|
-| Abnormal | 0.68 | 0.68 | 0.68 | 180 frames |
-| Normal   | 0.76 | 0.75 | 0.76 | 240 frames |
+| Abnormal | 0.68 | 0.68 | 0.68 | 180 frames (6 videos) |
+| Normal   | 0.76 | 0.75 | 0.76 | 240 frames (8 videos) |
 
-**Confusion Matrix** (val: 14 videos / 420 frames)
+**Confusion Matrix**
 
 |  | Pred Abnormal | Pred Normal |
-|--|--------------|-------------|
+|--|:---:|:---:|
 | True Abnormal | 123 | 57 |
 | True Normal   | 59  | 181 |
 
-> 프레임 단위 split 시 acc 100% (데이터 누수) → 영상 단위 split으로 교정 후 72.4%
+> 프레임 단위 split 사용 시 acc 100% (데이터 누수) → 영상 단위 split 교정 후 72.4%
+
+## 데이터셋
+
+| 클래스 | 영상 수 | Optical Flow 이미지 수 |
+|--------|--------|----------------------|
+| Normal   | 41 | 1,230 |
+| Abnormal | 32 | 960 |
+| **합계** | **73** | **2,190** |
 
 ## 환경
 
@@ -96,10 +131,11 @@ python src/04_diagnosis.py --video <영상 경로>
 - OpenCV 4.13
 - PyTorch 2.12 (CPU)
 - torchvision 0.27
+- scikit-learn 1.x
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install opencv-python numpy
+pip install opencv-python numpy scikit-learn
 ```
