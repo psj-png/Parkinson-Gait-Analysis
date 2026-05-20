@@ -1,0 +1,9 @@
+{
+  "video": "C:\\Gait_Analysis\\data\\02_Abnormal\\A01_Act_S_01.mp4",
+  "prediction": "Abnormal",
+  "confidence": {
+    "Abnormal": 0.9947,
+    "Normal": 0.0053
+  },
+  "frames_analyzed": 30
+}

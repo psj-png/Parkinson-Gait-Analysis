@@ -17,5 +17,4 @@ data/
 archive/
 output/optical_flow/
 output/models/
-output/results/diagnosis_*.json
 
