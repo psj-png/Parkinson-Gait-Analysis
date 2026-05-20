@@ -39,8 +39,9 @@ python src/01_extract_optical_flow.py
 ```bash
 python src/02_train_cnn.py
 ```
-- ImageFolder 기반 데이터 로딩 (80/20 train/val 자동 분할, seed=42)
+- **영상 단위** 80/20 train/val 분리 (seed=42) — 동일 영상의 프레임이 train/val에 섞이지 않음
 - ResNet-18 (ImageNet pretrained) fine-tuning
+- 매 에포크 Loss / Accuracy / F1 출력, 완료 시 classification report 자동 출력
 - 결과: `output/models/cnn_best.pth`
 
 ### 3. Grad-CAM 시각화
@@ -64,6 +65,30 @@ python src/04_diagnosis.py --video <영상 경로>
 | Normal | 41 | 1,230 |
 | Abnormal | 32 | 960 |
 | **합계** | **73** | **2,190** |
+
+## 모델 평가 결과
+
+> ResNet-18, 20 epochs, video-level 80/20 split (seed=42)
+
+| 지표 | 값 |
+|------|-----|
+| Accuracy | **72.38%** |
+| F1 (weighted) | **0.7240** |
+| F1 (macro) | **0.7184** |
+
+| 클래스 | Precision | Recall | F1 | Support |
+|--------|-----------|--------|----|---------|
+| Abnormal | 0.68 | 0.68 | 0.68 | 180 frames |
+| Normal   | 0.76 | 0.75 | 0.76 | 240 frames |
+
+**Confusion Matrix** (val: 14 videos / 420 frames)
+
+|  | Pred Abnormal | Pred Normal |
+|--|--------------|-------------|
+| True Abnormal | 123 | 57 |
+| True Normal   | 59  | 181 |
+
+> 프레임 단위 split 시 acc 100% (데이터 누수) → 영상 단위 split으로 교정 후 72.4%
 
 ## 환경
 
