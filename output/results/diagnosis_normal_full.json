@@ -1,0 +1,438 @@
+{
+  "dataset": "01_Normal",
+  "model": "ResNet-18 (video-level split, 20 epochs)",
+  "tested_at": "2026-05-20",
+  "total": 41,
+  "correct": 39,
+  "incorrect": 2,
+  "accuracy": 0.9512,
+  "confidence_stats": {
+    "mean": 0.8929,
+    "median": 0.9531,
+    "min": 0.0846,
+    "max": 0.9986,
+    "std": 0.1711
+  },
+  "confidence_distribution": {
+    "0.9_1.0": 30,
+    "0.7_0.9": 8,
+    "0.5_0.7": 1,
+    "0.0_0.5": 2
+  },
+  "misclassified": [
+    "S11_Norm_S_02.mp4",
+    "S15_Norm_S_01.mp4"
+  ],
+  "results": [
+    {
+      "video": "S01_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9873,
+        "Abnormal": 0.0127
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S02_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9677,
+        "Abnormal": 0.0323
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S02_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9608,
+        "Abnormal": 0.0392
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S02_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9838,
+        "Abnormal": 0.0162
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S02_Norm_S_02.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.921,
+        "Abnormal": 0.079
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S03_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.977,
+        "Abnormal": 0.023
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S03_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9397,
+        "Abnormal": 0.0603
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S04_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.8238,
+        "Abnormal": 0.1762
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S04_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9821,
+        "Abnormal": 0.0179
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S05_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.962,
+        "Abnormal": 0.038
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S06_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.8939,
+        "Abnormal": 0.1061
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S07_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9849,
+        "Abnormal": 0.0151
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S07_Norm_S_02.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9834,
+        "Abnormal": 0.0166
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S08_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9056,
+        "Abnormal": 0.0944
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S08_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.7581,
+        "Abnormal": 0.2419
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S09_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9946,
+        "Abnormal": 0.0054
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S09_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9441,
+        "Abnormal": 0.0559
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S09_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9713,
+        "Abnormal": 0.0287
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S09_Norm_S_02.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9978,
+        "Abnormal": 0.0022
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S10_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.993,
+        "Abnormal": 0.007
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S10_Norm_S_02.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9986,
+        "Abnormal": 0.0014
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S11_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9503,
+        "Abnormal": 0.0497
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S11_Norm_S_02.mp4",
+      "prediction": "Abnormal",
+      "correct": false,
+      "confidence": {
+        "Normal": 0.0846,
+        "Abnormal": 0.9154
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S12_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.8997,
+        "Abnormal": 0.1003
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S12_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.8328,
+        "Abnormal": 0.1672
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S12_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9163,
+        "Abnormal": 0.0837
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S12_Norm_S_02.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.7377,
+        "Abnormal": 0.2623
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S13_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9978,
+        "Abnormal": 0.0022
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S13_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9531,
+        "Abnormal": 0.0469
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S14_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9672,
+        "Abnormal": 0.0328
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S14_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9281,
+        "Abnormal": 0.0719
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S15_Norm_S_01.mp4",
+      "prediction": "Abnormal",
+      "correct": false,
+      "confidence": {
+        "Normal": 0.4159,
+        "Abnormal": 0.5841
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S15_Norm_S_02.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9961,
+        "Abnormal": 0.0039
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S16_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9071,
+        "Abnormal": 0.0929
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S16_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9791,
+        "Abnormal": 0.0209
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S16_Norm_S_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9542,
+        "Abnormal": 0.0458
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S16_Norm_S_02.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9706,
+        "Abnormal": 0.0294
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S17_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.9516,
+        "Abnormal": 0.0484
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S17_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.7172,
+        "Abnormal": 0.2828
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S18_Norm_B_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.6432,
+        "Abnormal": 0.3568
+      },
+      "frames_analyzed": 30
+    },
+    {
+      "video": "S18_Norm_F_01.mp4",
+      "prediction": "Normal",
+      "correct": true,
+      "confidence": {
+        "Normal": 0.8748,
+        "Abnormal": 0.1252
+      },
+      "frames_analyzed": 30
+    }
+  ]
+}
