@@ -17,8 +17,9 @@ from torchvision import models, transforms
 from pathlib import Path
 from PIL import Image
 
-MODEL_PATH = Path("../output/models/cnn_best.pth")
-RESULT_DIR = Path("../output/results")
+_BASE      = Path(__file__).resolve().parent.parent
+MODEL_PATH = _BASE / "output" / "models" / "cnn_best.pth"
+RESULT_DIR = _BASE / "output" / "results"
 IMG_SIZE   = 224
 CLASSES    = ["Abnormal", "Normal"]
 N_FRAMES   = 30
