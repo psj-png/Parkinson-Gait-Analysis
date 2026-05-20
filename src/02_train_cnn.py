@@ -3,13 +3,19 @@ Step 2: Train a CNN (ResNet-18) for Normal vs Abnormal binary classification.
 
 Input : output/optical_flow/{Normal,Abnormal}/
 Output: output/models/cnn_best.pth
+
+Split: video-level 80/20  — 같은 영상의 프레임이 train/val에 섞이지 않도록 분리
 """
 
+import random
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, Subset
-from torchvision import datasets, models, transforms
+from torch.utils.data import Dataset, DataLoader
+from torchvision import models, transforms
+from sklearn.metrics import f1_score, classification_report
 from pathlib import Path
+from collections import defaultdict
+from PIL import Image
 
 _BASE      = Path(__file__).resolve().parent.parent
 DATA_DIR   = _BASE / "output" / "optical_flow"
@@ -24,10 +30,72 @@ VAL_RATIO  = 0.2
 SEED       = 42
 
 
+class FrameDataset(Dataset):
+    def __init__(self, samples: list, transform=None):
+        self.samples   = samples   # list of (Path, int)
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, idx):
+        path, label = self.samples[idx]
+        img = Image.open(path).convert("RGB")
+        if self.transform:
+            img = self.transform(img)
+        return img, label
+
+
+def video_level_split():
+    """
+    영상(폴더) 단위로 train/val 분리.
+    구조: DATA_DIR/<class>/<video_name>/<frame>.png
+    """
+    classes     = sorted([d.name for d in DATA_DIR.iterdir() if d.is_dir()])
+    class_to_idx = {c: i for i, c in enumerate(classes)}
+
+    rng = random.Random(SEED)
+    train_samples, val_samples = [], []
+    summary = []
+
+    for cls in classes:
+        label     = class_to_idx[cls]
+        video_dirs = sorted((DATA_DIR / cls).iterdir())
+        video_dirs = [v for v in video_dirs if v.is_dir()]
+
+        shuffled = video_dirs[:]
+        rng.shuffle(shuffled)
+
+        n_val   = max(1, int(len(shuffled) * VAL_RATIO))
+        val_dirs   = shuffled[:n_val]
+        train_dirs = shuffled[n_val:]
+
+        for vdir in train_dirs:
+            for img in sorted(vdir.glob("*.png")):
+                train_samples.append((img, label))
+        for vdir in val_dirs:
+            for img in sorted(vdir.glob("*.png")):
+                val_samples.append((img, label))
+
+        summary.append(
+            f"  [{cls}] total={len(video_dirs)} videos  "
+            f"train={len(train_dirs)}({len(train_dirs)*30} frames)  "
+            f"val={len(val_dirs)}({len(val_dirs)*30} frames)"
+        )
+
+    print("=== Video-level split ===")
+    for line in summary:
+        print(line)
+    print(f"  Total: train={len(train_samples)} frames, val={len(val_samples)} frames")
+    print()
+    return train_samples, val_samples, classes
+
+
 def get_dataloaders():
     train_tfm = transforms.Compose([
         transforms.Resize((IMG_SIZE, IMG_SIZE)),
         transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406],
                              [0.229, 0.224, 0.225]),
@@ -39,25 +107,15 @@ def get_dataloaders():
                              [0.229, 0.224, 0.225]),
     ])
 
-    # 같은 인덱스 분할을 두 transform에 각각 적용
-    full_train = datasets.ImageFolder(DATA_DIR, transform=train_tfm)
-    full_val   = datasets.ImageFolder(DATA_DIR, transform=val_tfm)
-
-    n       = len(full_train)
-    n_val   = int(n * VAL_RATIO)
-    n_train = n - n_val
-    indices = torch.randperm(n, generator=torch.Generator().manual_seed(SEED)).tolist()
-
-    train_set = Subset(full_train, indices[:n_train])
-    val_set   = Subset(full_val,   indices[n_train:])
-
-    print(f"Dataset split: train={n_train}, val={n_val} (total={n})")
+    train_samples, val_samples, classes = video_level_split()
 
     loaders = {
-        "train": DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True),
-        "val":   DataLoader(val_set,   batch_size=BATCH_SIZE, shuffle=False),
+        "train": DataLoader(FrameDataset(train_samples, train_tfm),
+                            batch_size=BATCH_SIZE, shuffle=True,  num_workers=0),
+        "val":   DataLoader(FrameDataset(val_samples,   val_tfm),
+                            batch_size=BATCH_SIZE, shuffle=False, num_workers=0),
     }
-    return loaders, full_train.classes
+    return loaders, classes
 
 
 def build_model(num_classes: int = 2):
@@ -68,13 +126,15 @@ def build_model(num_classes: int = 2):
 
 def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Device: {device}")
+    print(f"Device : {device}")
+    print(f"Epochs : {EPOCHS},  LR : {LR},  Batch : {BATCH_SIZE}")
+    print()
 
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     loaders, classes = get_dataloaders()
-    print(f"Classes: {classes}")
+    print(f"Classes: {classes}  (idx 0={classes[0]}, 1={classes[1]})\n")
 
-    model = build_model(num_classes=len(classes)).to(device)
+    model     = build_model(num_classes=len(classes)).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=LR)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
@@ -83,32 +143,53 @@ def train():
     for epoch in range(EPOCHS):
         for phase in ["train", "val"]:
             model.train() if phase == "train" else model.eval()
-            running_loss, running_corrects = 0.0, 0
+            running_loss = 0.0
+            all_preds, all_labels = [], []
 
             for inputs, labels in loaders[phase]:
                 inputs, labels = inputs.to(device), labels.to(device)
                 optimizer.zero_grad()
                 with torch.set_grad_enabled(phase == "train"):
                     outputs = model(inputs)
-                    loss = criterion(outputs, labels)
-                    preds = outputs.argmax(1)
+                    loss    = criterion(outputs, labels)
+                    preds   = outputs.argmax(1)
                     if phase == "train":
                         loss.backward()
                         optimizer.step()
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += (preds == labels).sum().item()
+                all_preds.extend(preds.cpu().tolist())
+                all_labels.extend(labels.cpu().tolist())
 
-            epoch_acc = running_corrects / len(loaders[phase].dataset)
-            print(f"Epoch {epoch+1}/{EPOCHS} [{phase}] Acc: {epoch_acc:.4f}")
+            n      = len(loaders[phase].dataset)
+            acc    = sum(p == l for p, l in zip(all_preds, all_labels)) / n
+            f1     = f1_score(all_labels, all_preds, average="weighted")
+            loss_avg = running_loss / n
+            print(f"Epoch {epoch+1:02d}/{EPOCHS} [{phase:5s}] "
+                  f"Loss: {loss_avg:.4f}  Acc: {acc:.4f}  F1: {f1:.4f}")
 
-            if phase == "val" and epoch_acc > best_acc:
-                best_acc = epoch_acc
+            if phase == "val" and acc > best_acc:
+                best_acc = acc
                 torch.save(model.state_dict(), MODEL_PATH)
-                print(f"  -> Best model saved (acc={best_acc:.4f})")
+                print(f"           -> Best model saved (acc={best_acc:.4f})")
 
         scheduler.step()
+        print()
 
-    print(f"Training complete. Best val acc: {best_acc:.4f}")
+    # 최종 val 리포트
+    print("=" * 55)
+    print(f"Training complete.  Best val acc: {best_acc:.4f}")
+    print("=" * 55)
+    print("\n[Final Val Classification Report]")
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+    model.eval()
+    all_preds, all_labels = [], []
+    with torch.no_grad():
+        for inputs, labels in loaders["val"]:
+            inputs = inputs.to(device)
+            preds  = model(inputs).argmax(1)
+            all_preds.extend(preds.cpu().tolist())
+            all_labels.extend(labels.cpu().tolist())
+    print(classification_report(all_labels, all_preds, target_names=classes))
 
 
 if __name__ == "__main__":
