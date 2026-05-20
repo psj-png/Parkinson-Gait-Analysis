@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pth
+*.pkl
+
+# 환경
+venv/
+.idea/
+.vscode/
+.pytest_cache/
+.claude/
+.gitignore.txt
+
+# 데이터 (대용량)
+data/
+archive/
+output/optical_flow/
+output/models/
+output/results/
