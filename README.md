@@ -10,7 +10,7 @@ Optical Flow + CNN (ResNet-18) + Grad-CAM 기반 보행 이상 이진 분류 파
 | 2. CNN 학습 | `02_train_cnn.py` | 완료 | Acc 72.38%, F1 0.724 |
 | 3. Grad-CAM 시각화 | `03_gradcam.py` | 완료 | 샘플 10장 생성 |
 | 4. 단일 영상 진단 | `04_diagnosis.py` | 완료 | Normal 98.73% / Abnormal 99.47% |
-| 5. 전체 데이터셋 진단 | `04_diagnosis.py` | 완료 | **전체 94.5%** (Normal 95.1% / Abnormal 93.8%) |
+| 5. Confusion Matrix 시각화 | `05_confusion_matrix.py` | 완료 | **전체 94.5%** (Normal 95.1% / Abnormal 93.8%) |
 
 ## 폴더 구조
 
