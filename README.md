@@ -180,18 +180,34 @@ python src/04_diagnosis.py --video <영상 경로>
 > ResNet-18, 20 epochs, video-level 80/20 split (seed=42)
 > Train: 59 videos (1,770 frames) / Val: 14 videos (420 frames)
 
-| 지표 | 값 |
-|------|-----|
-| Accuracy | **72.38%** |
-| F1 (weighted) | **0.7240** |
-| F1 (macro) | **0.7184** |
+### Training Curve
+
+![Training Curve](output/plots/training_curve.png)
+
+### 원본 vs Person-Crop 비교
+
+MediaPipe Pose로 사람 영역만 crop해 배경을 제거한 후 재학습한 실험 결과.
+
+| 지표 | 원본 Optical Flow | Person Crop |
+|------|:-----------------:|:-----------:|
+| Best val Accuracy | **72.38%** | **72.38%** |
+| Best epoch | 20 | 4 |
+| Train Acc (최종) | ~99% | ~100% |
+| Abnormal Precision | 0.68 | 0.71 |
+| Abnormal Recall | 0.68 | 0.61 |
+| Normal Precision | 0.76 | 0.73 |
+| Normal Recall | 0.75 | 0.81 |
+
+**결론:** Crop 전처리는 val accuracy에는 영향 없음. Epoch 2에서 train acc가 97%로 포화되는 극단적 과적합이 근본 원인으로, 데이터 73개 대비 ResNet-18(1,100만 파라미터)의 모델 용량 불균형이 병목.
+
+### 원본 모델 분류 리포트
 
 | 클래스 | Precision | Recall | F1 | Support |
 |--------|-----------|--------|----|---------|
 | Abnormal | 0.68 | 0.68 | 0.68 | 180 frames (6 videos) |
 | Normal   | 0.76 | 0.75 | 0.76 | 240 frames (8 videos) |
 
-**Confusion Matrix**
+**Confusion Matrix (Validation Set)**
 
 |  | Pred Abnormal | Pred Normal |
 |--|:---:|:---:|
