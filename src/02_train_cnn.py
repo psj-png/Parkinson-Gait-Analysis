@@ -12,14 +12,18 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from torchvision import models, transforms
-from sklearn.metrics import f1_score, classification_report
+from sklearn.metrics import f1_score, classification_report, confusion_matrix
 from pathlib import Path
 from collections import defaultdict
 from PIL import Image
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 _BASE      = Path(__file__).resolve().parent.parent
 DATA_DIR   = _BASE / "output" / "optical_flow"
 MODEL_DIR  = _BASE / "output" / "models"
+PLOT_DIR   = _BASE / "output" / "plots"
 MODEL_PATH = MODEL_DIR / "cnn_best.pth"
 
 BATCH_SIZE = 16
@@ -190,6 +194,26 @@ def train():
             all_preds.extend(preds.cpu().tolist())
             all_labels.extend(labels.cpu().tolist())
     print(classification_report(all_labels, all_preds, target_names=classes))
+
+    PLOT_DIR.mkdir(parents=True, exist_ok=True)
+    _save_confusion_matrix(all_labels, all_preds, classes, PLOT_DIR / "confusion_matrix_val.png")
+    print(f"\nConfusion matrix saved: {PLOT_DIR / 'confusion_matrix_val.png'}")
+
+
+def _save_confusion_matrix(labels, preds, class_names, out_path):
+    cm = confusion_matrix(labels, preds)
+    fig, ax = plt.subplots(figsize=(6, 5))
+    sns.heatmap(
+        cm, annot=True, fmt="d", cmap="Blues",
+        xticklabels=class_names, yticklabels=class_names,
+        linewidths=0.5, ax=ax,
+    )
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("Actual")
+    ax.set_title("Confusion Matrix (Validation Set)")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
 
 
 if __name__ == "__main__":
