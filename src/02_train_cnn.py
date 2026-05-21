@@ -24,7 +24,7 @@ import numpy as np
 import json
 
 _BASE      = Path(__file__).resolve().parent.parent
-DATA_DIR   = _BASE / "output" / "optical_flow"
+DATA_DIR   = _BASE / "output" / "optical_flow_crop"
 MODEL_DIR  = _BASE / "output" / "models"
 PLOT_DIR   = _BASE / "output" / "plots"
 MODEL_PATH = MODEL_DIR / "cnn_best.pth"

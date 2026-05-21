@@ -16,5 +16,10 @@ venv/
 data/
 archive/
 output/optical_flow/
+output/optical_flow_crop/
 output/models/
+
+# 로그
+*.txt
+!requirements.txt
 
