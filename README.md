@@ -11,6 +11,7 @@ Optical Flow + CNN (ResNet-18) + Grad-CAM 기반 보행 이상 이진 분류 파
 | 3. Grad-CAM 시각화 | `03_gradcam.py` | 완료 | 샘플 10장 생성 |
 | 4. 단일 영상 진단 | `04_diagnosis.py` | 완료 | Normal 98.73% / Abnormal 99.47% |
 | 5. Confusion Matrix 시각화 | `05_confusion_matrix.py` | 완료 | **전체 94.5%** (Normal 95.1% / Abnormal 93.8%) |
+| 6. GradCAM GIF 생성 | `06_gradcam_gif.py` | 완료 | Normal / Abnormal 대표 영상 GIF 각 1개 |
 
 ## 폴더 구조
 
@@ -66,7 +67,20 @@ python src/03_gradcam.py
 - 파일명에 예측 클래스·신뢰도 포함 (`_predNormal_0.97.png`)
 - 결과: `output/results/gradcam/{Normal,Abnormal}/`
 
-**Grad-CAM 샘플**
+**Grad-CAM 애니메이션** (30 frames, 10 fps)
+
+<table>
+  <tr>
+    <th>Normal — S01_Norm_S_01 (신뢰도 0.97)</th>
+    <th>Abnormal — A01_Act_S_01 (신뢰도 1.00)</th>
+  </tr>
+  <tr>
+    <td><img src="output/plots/gradcam_Normal.gif" width="340"/></td>
+    <td><img src="output/plots/gradcam_Abnormal.gif" width="340"/></td>
+  </tr>
+</table>
+
+**Grad-CAM 샘플 (정지 이미지)**
 
 <table>
   <tr>
