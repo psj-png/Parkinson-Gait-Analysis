@@ -78,6 +78,10 @@ python src/04_diagnosis.py --video <영상 경로>
 > `04_diagnosis.py`로 전체 73개 영상 진단
 > 결과 저장: `output/results/diagnosis_normal_full.json`, `output/results/diagnosis_abnormal_full.json`
 
+### Confusion Matrix
+
+![Confusion Matrix](output/plots/confusion_matrix_test.png)
+
 **종합 요약**
 
 | 클래스 | 영상 수 | 정확 | 오분류 | 정확도 |
