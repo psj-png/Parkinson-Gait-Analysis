@@ -66,6 +66,23 @@ python src/03_gradcam.py
 - 파일명에 예측 클래스·신뢰도 포함 (`_predNormal_0.97.png`)
 - 결과: `output/results/gradcam/{Normal,Abnormal}/`
 
+**Grad-CAM 샘플**
+
+<table>
+  <tr>
+    <th>Normal (신뢰도 0.97)</th>
+    <th>Abnormal (신뢰도 1.00)</th>
+  </tr>
+  <tr>
+    <td><img src="output/results/gradcam/Normal/S01_Norm_S_01_frame0015_predNormal_0.97.png" width="340"/></td>
+    <td><img src="output/results/gradcam/Abnormal/A01_Act_S_01_frame0015_predAbnormal_1.00.png" width="340"/></td>
+  </tr>
+  <tr>
+    <td><img src="output/results/gradcam/Normal/S02_Norm_B_01_frame0015_predNormal_0.97.png" width="340"/></td>
+    <td><img src="output/results/gradcam/Abnormal/A02_Abn_S_01_frame0015_predAbnormal_1.00.png" width="340"/></td>
+  </tr>
+</table>
+
 ### Step 4. 단일 영상 진단
 ```bash
 python src/04_diagnosis.py --video <영상 경로>
