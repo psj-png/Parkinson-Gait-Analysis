@@ -16,9 +16,12 @@ from sklearn.metrics import f1_score, classification_report, confusion_matrix
 from pathlib import Path
 from collections import defaultdict
 from PIL import Image
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import json
 
 _BASE      = Path(__file__).resolve().parent.parent
 DATA_DIR   = _BASE / "output" / "optical_flow"
@@ -144,6 +147,8 @@ def train():
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
     best_acc = 0.0
+    history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
+
     for epoch in range(EPOCHS):
         for phase in ["train", "val"]:
             model.train() if phase == "train" else model.eval()
@@ -164,10 +169,12 @@ def train():
                 all_preds.extend(preds.cpu().tolist())
                 all_labels.extend(labels.cpu().tolist())
 
-            n      = len(loaders[phase].dataset)
-            acc    = sum(p == l for p, l in zip(all_preds, all_labels)) / n
-            f1     = f1_score(all_labels, all_preds, average="weighted")
+            n        = len(loaders[phase].dataset)
+            acc      = sum(p == l for p, l in zip(all_preds, all_labels)) / n
+            f1       = f1_score(all_labels, all_preds, average="weighted")
             loss_avg = running_loss / n
+            history[f"{phase}_loss"].append(round(loss_avg, 6))
+            history[f"{phase}_acc"].append(round(acc, 6))
             print(f"Epoch {epoch+1:02d}/{EPOCHS} [{phase:5s}] "
                   f"Loss: {loss_avg:.4f}  Acc: {acc:.4f}  F1: {f1:.4f}")
 
@@ -177,6 +184,9 @@ def train():
                 print(f"           -> Best model saved (acc={best_acc:.4f})")
 
         scheduler.step()
+        PLOT_DIR.mkdir(parents=True, exist_ok=True)
+        with open(PLOT_DIR / "training_history.json", "w") as f:
+            json.dump(history, f, indent=2)
         print()
 
     # 최종 val 리포트
@@ -198,6 +208,36 @@ def train():
     PLOT_DIR.mkdir(parents=True, exist_ok=True)
     _save_confusion_matrix(all_labels, all_preds, classes, PLOT_DIR / "confusion_matrix_val.png")
     print(f"\nConfusion matrix saved: {PLOT_DIR / 'confusion_matrix_val.png'}")
+
+    _save_training_curve(history, PLOT_DIR / "training_curve.png")
+    print(f"Training curve saved:  {PLOT_DIR / 'training_curve.png'}")
+
+
+def _save_training_curve(history: dict, out_path):
+    epochs = range(1, len(history["train_loss"]) + 1)
+    fig, (ax_loss, ax_acc) = plt.subplots(1, 2, figsize=(12, 5))
+
+    ax_loss.plot(epochs, history["train_loss"], "o-", label="Train")
+    ax_loss.plot(epochs, history["val_loss"],   "s--", label="Val")
+    ax_loss.set_xlabel("Epoch")
+    ax_loss.set_ylabel("Loss")
+    ax_loss.set_title("Loss per Epoch")
+    ax_loss.legend()
+    ax_loss.grid(alpha=0.3)
+
+    ax_acc.plot(epochs, history["train_acc"], "o-", label="Train")
+    ax_acc.plot(epochs, history["val_acc"],   "s--", label="Val")
+    ax_acc.set_xlabel("Epoch")
+    ax_acc.set_ylabel("Accuracy")
+    ax_acc.set_title("Accuracy per Epoch")
+    ax_acc.set_ylim(0, 1)
+    ax_acc.legend()
+    ax_acc.grid(alpha=0.3)
+
+    fig.suptitle("ResNet-18 Training Curves", fontsize=13, fontweight="bold")
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
 
 
 def _save_confusion_matrix(labels, preds, class_names, out_path):
