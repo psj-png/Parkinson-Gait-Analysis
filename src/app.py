@@ -10,7 +10,7 @@ import uuid
 import importlib.util
 from pathlib import Path
 
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template
 
 # 04_diagnosis.py는 숫자로 시작해 일반 import 불가 → importlib으로 로드
 _spec = importlib.util.spec_from_file_location(
@@ -21,39 +21,22 @@ _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 diagnose = _mod.diagnose
 
-_BASE      = Path(__file__).resolve().parent.parent
-UPLOAD_DIR = _BASE / "output" / "uploads"
+_BASE        = Path(__file__).resolve().parent.parent
+UPLOAD_DIR   = _BASE / "output" / "uploads"
+TEMPLATE_DIR = _BASE / "templates"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 ALLOWED_EXT = {".mp4", ".avi", ".mov", ".mkv"}
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=str(TEMPLATE_DIR))
 app.config["MAX_CONTENT_LENGTH"] = 500 * 1024 * 1024  # 500 MB
 
 
 # ── 업로드 폼 ──────────────────────────────────────────────────────────────────
 
-INDEX_HTML = """
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>보행 분석 데모</title>
-</head>
-<body>
-  <h1>보행 이상 분석</h1>
-  <form action="/diagnose" method="post" enctype="multipart/form-data">
-    <input type="file" name="video" accept="video/*" required>
-    <button type="submit">분석 시작</button>
-  </form>
-</body>
-</html>
-"""
-
 @app.route("/")
 def index():
-    return render_template_string(INDEX_HTML)
+    return render_template("index.html")
 
 
 # ── 진단 ───────────────────────────────────────────────────────────────────────
