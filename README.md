@@ -238,3 +238,26 @@ venv\Scripts\activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 pip install opencv-python numpy scikit-learn
 ```
+
+## 한계점
+
+### 1. 파킨슨 확진 환자 보행 영상 데이터 부재
+- 공개된 파킨슨 보행 영상 데이터셋이 전 세계적으로 극히 제한적
+- Figshare 공개 데이터셋(35명, 73개 영상) 확인했으나 360도 회전 동작만 포함, 직선 보행 데이터 없음
+- 결과적으로 Normal vs Abnormal 이진 분류로 접근
+- Abnormal이 파킨슨 특이적 보행이 아닐 수 있음
+
+### 2. 소규모 데이터셋으로 인한 과적합
+- 73개 영상, ResNet-18 1,100만 파라미터
+- Train Acc 99% vs Val Acc 72%로 과적합 발생
+- Person Crop 전처리 추가했으나 개선 없음
+- 데이터 수 자체가 근본 원인
+
+### 3. 외부 검증 데이터 부재
+- 학습/검증 모두 동일 출처 데이터
+- 완전히 다른 환경에서 촬영된 영상으로 검증 필요
+
+### 4. 향후 연구 방향
+- 병원 협력을 통한 파킨슨 확진 환자 직선 보행 영상 수집
+- EEG 등 생체신호와 멀티모달 융합
+- 더 많은 데이터 확보 후 경량 모델(MobileNet)로 모바일 온디바이스 배포
