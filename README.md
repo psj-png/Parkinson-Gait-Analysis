@@ -45,7 +45,7 @@ archive/              이전 파이프라인 파일 백업
 python src/01_extract_optical_flow.py
 ```
 - Farneback Optical Flow → HSV 색상 맵으로 변환 후 저장
-- 영상당 30프레임 추출
+- 영상당 30프레임 추출 (보행 1사이클 ≈ 1초, 30fps 기준 1사이클을 완전히 커버하는 최소 단위. 학습·진단 조건 통일)
 - 결과: `output/optical_flow/{Normal,Abnormal}/<영상명>/`
 
 ### Step 2. CNN 학습

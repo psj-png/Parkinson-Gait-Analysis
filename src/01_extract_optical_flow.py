@@ -18,6 +18,8 @@ INPUT_DIRS = {
 OUTPUT_BASE = _BASE / "output" / "optical_flow"
 
 
+# 보행 1사이클(한 걸음 왕복)은 약 1초 → 30fps 영상에서 30프레임이면 1사이클을 완전히 커버.
+# 학습 데이터(3~5초 영상)와 동일한 샘플 수를 유지해 train/inference 조건을 통일.
 def extract_optical_flow(video_path: Path, out_dir: Path, n_frames: int = 30):
     """Extract Farneback optical flow frames from a video and save as images."""
     out_dir.mkdir(parents=True, exist_ok=True)

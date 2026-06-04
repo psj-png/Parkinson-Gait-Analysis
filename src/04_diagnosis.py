@@ -22,6 +22,8 @@ MODEL_PATH = _BASE / "output" / "models" / "cnn_best.pth"
 RESULT_DIR = _BASE / "output" / "results"
 IMG_SIZE   = 224
 CLASSES    = ["Abnormal", "Normal"]
+# 보행 1사이클(한 걸음 왕복)은 약 1초 → 30fps 영상에서 30프레임이면 1사이클을 완전히 커버.
+# 학습 데이터(3~5초 영상)와 동일한 샘플 수를 유지해 train/inference 조건을 통일.
 N_FRAMES   = 30
 
 TRANSFORM = transforms.Compose([
