@@ -3,7 +3,6 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.12-ee4c2c?logo=pytorch)
 ![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)
-![License](https://img.shields.io/badge/License-MIT-green)
 
 ## 프로젝트 소개
 
