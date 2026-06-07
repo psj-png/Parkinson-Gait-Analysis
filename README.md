@@ -261,3 +261,22 @@ pip install opencv-python numpy scikit-learn
 - 병원 협력을 통한 파킨슨 확진 환자 직선 보행 영상 수집
 - EEG 등 생체신호와 멀티모달 융합
 - 더 많은 데이터 확보 후 경량 모델(MobileNet)로 모바일 온디바이스 배포
+
+## References
+
+### 기법 및 모델
+
+- He, K., Zhang, X., Ren, S., & Sun, J. (2016). **Deep Residual Learning for Image Recognition**. CVPR 2016.
+- Selvaraju, R. R., et al. (2017). **Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization**. ICCV 2017.
+- Farnebäck, G. (2003). **Two-Frame Motion Estimation Based on Polynomial Expansion**. SCIA 2003.
+- Lugaresi, C., et al. (2019). **MediaPipe: A Framework for Building Perception Pipelines**. Google LLC.
+
+### 라이브러리
+
+- PyTorch / torchvision — https://pytorch.org
+- OpenCV — https://opencv.org
+- Flask — https://flask.palletsprojects.com
+
+### 데이터셋
+
+- Normal 및 Abnormal 보행 영상: YouTube 및 인터넷 공개 영상에서 수집. Accessed 2025–2026.
