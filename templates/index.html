@@ -16,12 +16,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 40px 16px;
+      padding: 40px 16px 60px;
       overflow-x: hidden;
     }
 
-    /* 배경 그라디언트 orbs */
     body::before, body::after {
       content: '';
       position: fixed;
@@ -46,20 +44,20 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 460px;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     /* 헤더 */
-    .header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
+    .header { text-align: center; margin-bottom: 12px; }
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(108, 59, 255, 0.15);
-      border: 1px solid rgba(108, 59, 255, 0.35);
+      background: rgba(108,59,255,0.15);
+      border: 1px solid rgba(108,59,255,0.35);
       color: #a78bfa;
       font-size: 0.72rem;
       font-weight: 600;
@@ -86,18 +84,14 @@
       letter-spacing: -0.02em;
       margin-bottom: 8px;
     }
-    .subtitle {
-      font-size: 0.85rem;
-      color: #64748b;
-      line-height: 1.5;
-    }
+    .subtitle { font-size: 0.85rem; color: #64748b; line-height: 1.5; }
 
-    /* 카드 */
+    /* 카드 공통 */
     .card {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 20px;
-      padding: 28px;
+      padding: 24px;
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
     }
@@ -110,7 +104,7 @@
       text-align: center;
       cursor: pointer;
       transition: all 0.25s;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       position: relative;
       overflow: hidden;
     }
@@ -122,15 +116,9 @@
       opacity: 0;
       transition: opacity 0.25s;
     }
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: rgba(108,59,255,0.6);
-    }
-    .drop-zone:hover::before, .drop-zone.dragover::before {
-      opacity: 1;
-    }
-    .drop-zone.dragover {
-      background: rgba(108,59,255,0.05);
-    }
+    .drop-zone:hover::before, .drop-zone.dragover::before { opacity: 1; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: rgba(108,59,255,0.6); }
+    .drop-zone.dragover { background: rgba(108,59,255,0.05); }
 
     .drop-icon {
       width: 52px; height: 52px;
@@ -144,19 +132,9 @@
       font-size: 1.4rem;
       transition: transform 0.2s;
     }
-    .drop-zone:hover .drop-icon {
-      transform: translateY(-2px);
-    }
-    .drop-label {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #cbd5e1;
-      margin-bottom: 5px;
-    }
-    .drop-hint {
-      font-size: 0.75rem;
-      color: #475569;
-    }
+    .drop-zone:hover .drop-icon { transform: translateY(-2px); }
+    .drop-label { font-size: 0.9rem; font-weight: 500; color: #cbd5e1; margin-bottom: 5px; }
+    .drop-hint  { font-size: 0.75rem; color: #475569; }
     .filename-tag {
       display: inline-flex;
       align-items: center;
@@ -169,10 +147,8 @@
       font-weight: 500;
       padding: 4px 10px;
       border-radius: 8px;
-      max-width: 100%;
       word-break: break-all;
     }
-
     input[type="file"] { display: none; }
 
     /* 버튼 */
@@ -200,45 +176,26 @@
       transform: translateY(-1px);
       box-shadow: 0 6px 24px rgba(108,59,255,0.5);
     }
-    .btn-primary:not(:disabled):active {
-      transform: translateY(0);
-    }
-    .btn-primary:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
     .btn-ghost {
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
       color: #94a3b8;
       margin-top: 12px;
     }
-    .btn-ghost:hover {
-      background: rgba(255,255,255,0.08);
-      color: #cbd5e1;
-    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); color: #cbd5e1; }
 
     /* 로딩 */
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 28px 0 12px;
-    }
+    .loading { display: none; text-align: center; padding: 28px 0 12px; }
     .spinner-ring {
       width: 44px; height: 44px;
       margin: 0 auto 14px;
       position: relative;
     }
     .spinner-ring::before, .spinner-ring::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
+      content: ''; position: absolute; inset: 0; border-radius: 50%;
     }
-    .spinner-ring::before {
-      border: 3px solid rgba(255,255,255,0.06);
-    }
+    .spinner-ring::before { border: 3px solid rgba(255,255,255,0.06); }
     .spinner-ring::after {
       border: 3px solid transparent;
       border-top-color: #6c3bff;
@@ -246,113 +203,8 @@
       animation: spin 0.75s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text {
-      font-size: 0.85rem;
-      color: #64748b;
-    }
-    .loading-text span {
-      color: #a78bfa;
-      font-weight: 500;
-    }
-
-    /* 결과 */
-    .result {
-      display: none;
-      margin-top: 22px;
-      animation: fadeUp 0.4s ease;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .result-hero {
-      border-radius: 14px;
-      padding: 22px;
-      text-align: center;
-      margin-bottom: 18px;
-      position: relative;
-      overflow: hidden;
-    }
-    .result-hero.normal {
-      background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(5,150,105,0.05) 100%);
-      border: 1px solid rgba(16,185,129,0.2);
-    }
-    .result-hero.abnormal {
-      background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(185,28,28,0.05) 100%);
-      border: 1px solid rgba(239,68,68,0.2);
-    }
-
-    .result-icon {
-      font-size: 2.4rem;
-      margin-bottom: 8px;
-      display: block;
-    }
-    .result-label {
-      font-size: 1.4rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 4px;
-    }
-    .result-hero.normal   .result-label { color: #34d399; }
-    .result-hero.abnormal .result-label { color: #f87171; }
-    .result-conf-text {
-      font-size: 0.82rem;
-      color: #64748b;
-    }
-
-    /* 신뢰도 바 */
-    .conf-section {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .conf-row {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .conf-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .conf-name {
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: #94a3b8;
-    }
-    .conf-pct {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #cbd5e1;
-    }
-    .bar-track {
-      height: 6px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-      width: 0%;
-    }
-    .bar-normal   { background: linear-gradient(90deg, #10b981, #34d399); }
-    .bar-abnormal { background: linear-gradient(90deg, #ef4444, #f87171); }
-
-    .divider {
-      height: 1px;
-      background: rgba(255,255,255,0.06);
-      margin: 16px 0;
-    }
-
-    .frames-note {
-      text-align: center;
-      font-size: 0.75rem;
-      color: #475569;
-    }
+    .loading-text { font-size: 0.85rem; color: #64748b; }
+    .loading-text span { color: #a78bfa; font-weight: 500; }
 
     /* 에러 */
     .error-box {
@@ -365,20 +217,106 @@
       font-size: 0.82rem;
       color: #f87171;
     }
+
+    /* 결과 카드들 */
+    .result-cards { display: none; animation: fadeUp 0.4s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 결과 히어로 */
+    .result-hero {
+      border-radius: 14px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-hero.normal {
+      background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(5,150,105,0.05) 100%);
+      border: 1px solid rgba(16,185,129,0.2);
+    }
+    .result-hero.abnormal {
+      background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(185,28,28,0.05) 100%);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .result-icon  { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+    .result-label { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .result-hero.normal   .result-label { color: #34d399; }
+    .result-hero.abnormal .result-label { color: #f87171; }
+    .result-conf-text { font-size: 0.82rem; color: #64748b; }
+
+    /* 신뢰도 바 */
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 14px;
+    }
+    .conf-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .conf-row:last-child { margin-bottom: 0; }
+    .conf-meta { display: flex; justify-content: space-between; }
+    .conf-name { font-size: 0.82rem; font-weight: 500; color: #94a3b8; }
+    .conf-pct  { font-size: 0.82rem; font-weight: 600; color: #cbd5e1; }
+    .bar-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.16,1,0.3,1); width: 0%; }
+    .bar-normal   { background: linear-gradient(90deg, #10b981, #34d399); }
+    .bar-abnormal { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+    /* GradCAM */
+    .gradcam-wrap {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0d0d14;
+    }
+    .gradcam-wrap img {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+    }
+    .gradcam-caption {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    /* 신뢰도 그래프 */
+    .graph-wrap {
+      position: relative;
+      width: 100%;
+    }
+    canvas {
+      width: 100%;
+      border-radius: 10px;
+      display: block;
+    }
+    .graph-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .graph-labels span { font-size: 0.7rem; color: #475569; }
+
+    .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
+    .frames-note { text-align: center; font-size: 0.75rem; color: #475569; }
   </style>
 </head>
 <body>
   <div class="wrapper">
 
     <div class="header">
-      <div class="badge">
-        <span class="badge-dot"></span>
-        AI 보행 분석
-      </div>
+      <div class="badge"><span class="badge-dot"></span>AI 보행 분석</div>
       <h1>보행 이상 감지</h1>
       <p class="subtitle">Optical Flow + ResNet-18 기반<br>보행 패턴 실시간 분류</p>
     </div>
 
+    <!-- 업로드 카드 -->
     <div class="card">
       <div class="drop-zone" id="dropZone">
         <div class="drop-icon">🎬</div>
@@ -397,59 +335,79 @@
 
       <div class="loading" id="loading">
         <div class="spinner-ring"></div>
-        <div class="loading-text">
-          <span>Optical Flow</span> 추출 중…
-        </div>
+        <div class="loading-text"><span>Optical Flow</span> 추출 중…</div>
       </div>
 
       <div class="error-box" id="errorBox"></div>
+    </div>
 
-      <div class="result" id="result">
+    <!-- 결과 카드들 -->
+    <div class="result-cards" id="resultCards">
+
+      <!-- 1. 판정 결과 -->
+      <div class="card">
         <div class="result-hero" id="resultHero">
           <span class="result-icon" id="resultIcon"></span>
           <div class="result-label" id="resultLabel"></div>
           <div class="result-conf-text" id="resultConf"></div>
         </div>
-
-        <div class="conf-section">
-          <div class="conf-row">
-            <div class="conf-meta">
-              <span class="conf-name">Normal</span>
-              <span class="conf-pct" id="normalPct">—</span>
-            </div>
-            <div class="bar-track">
-              <div class="bar-fill bar-normal" id="normalBar"></div>
-            </div>
+        <div style="height:16px"></div>
+        <div class="section-title">신뢰도</div>
+        <div class="conf-row">
+          <div class="conf-meta">
+            <span class="conf-name">Normal</span>
+            <span class="conf-pct" id="normalPct">—</span>
           </div>
-          <div class="conf-row">
-            <div class="conf-meta">
-              <span class="conf-name">Abnormal</span>
-              <span class="conf-pct" id="abnormalPct">—</span>
-            </div>
-            <div class="bar-track">
-              <div class="bar-fill bar-abnormal" id="abnormalBar"></div>
-            </div>
-          </div>
+          <div class="bar-track"><div class="bar-fill bar-normal" id="normalBar"></div></div>
         </div>
-
-        <div class="divider"></div>
-        <div class="frames-note" id="framesNote"></div>
-
+        <div class="conf-row">
+          <div class="conf-meta">
+            <span class="conf-name">Abnormal</span>
+            <span class="conf-pct" id="abnormalPct">—</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill bar-abnormal" id="abnormalBar"></div></div>
+        </div>
+        <div class="divider" style="margin-top:16px"></div>
+        <div class="frames-note" id="framesNote" style="margin-top:10px"></div>
         <button class="btn btn-ghost" id="resetBtn">다시 분석하기</button>
       </div>
-    </div>
 
+      <!-- 2. GradCAM -->
+      <div class="card">
+        <div class="section-title">Grad-CAM — 모델 주목 영역</div>
+        <div class="gradcam-wrap">
+          <img id="gradcamImg" src="" alt="GradCAM">
+        </div>
+        <div class="gradcam-caption">
+          모델이 판단에 가장 크게 활용한 프레임. 붉은 영역일수록 높은 가중치.
+        </div>
+      </div>
+
+      <!-- 3. 프레임별 신뢰도 그래프 -->
+      <div class="card">
+        <div class="section-title">프레임별 Normal 확률</div>
+        <div class="graph-wrap">
+          <canvas id="confChart" height="160"></canvas>
+        </div>
+        <div class="graph-labels">
+          <span>Frame 1</span>
+          <span id="chartMidLabel"></span>
+          <span id="chartEndLabel"></span>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <script>
-    const dropZone  = document.getElementById("dropZone");
-    const fileInput = document.getElementById("fileInput");
-    const fileName  = document.getElementById("fileName");
-    const submitBtn = document.getElementById("submitBtn");
-    const loading   = document.getElementById("loading");
-    const errorBox  = document.getElementById("errorBox");
-    const resultDiv = document.getElementById("result");
-    const resetBtn  = document.getElementById("resetBtn");
+    const dropZone   = document.getElementById("dropZone");
+    const fileInput  = document.getElementById("fileInput");
+    const fileName   = document.getElementById("fileName");
+    const submitBtn  = document.getElementById("submitBtn");
+    const loading    = document.getElementById("loading");
+    const errorBox   = document.getElementById("errorBox");
+    const resultCards = document.getElementById("resultCards");
+    const resetBtn   = document.getElementById("resetBtn");
     let selectedFile = null;
 
     dropZone.addEventListener("click", () => fileInput.click());
@@ -463,16 +421,16 @@
       selectedFile = file;
       fileName.innerHTML = `<div class="filename-tag">📄 ${file.name}</div>`;
       submitBtn.disabled = false;
-      resultDiv.style.display = "none";
-      errorBox.style.display  = "none";
+      resultCards.style.display = "none";
+      errorBox.style.display    = "none";
     }
 
     submitBtn.addEventListener("click", async () => {
       if (!selectedFile) return;
-      submitBtn.disabled      = true;
-      loading.style.display   = "block";
-      resultDiv.style.display = "none";
-      errorBox.style.display  = "none";
+      submitBtn.disabled        = true;
+      loading.style.display     = "block";
+      resultCards.style.display = "none";
+      errorBox.style.display    = "none";
 
       const form = new FormData();
       form.append("video", selectedFile);
@@ -484,8 +442,8 @@
       } catch (e) {
         showError("네트워크 오류: " + e.message);
       } finally {
-        loading.style.display = "none";
-        submitBtn.disabled    = false;
+        loading.style.display  = "none";
+        submitBtn.disabled     = false;
       }
     });
 
@@ -495,19 +453,114 @@
       const normalP   = Math.round((conf.Normal   ?? 0) * 100);
       const abnormalP = Math.round((conf.Abnormal ?? 0) * 100);
 
-      document.getElementById("resultHero").className = "result-hero " + (isNormal ? "normal" : "abnormal");
+      // 판정
+      document.getElementById("resultHero").className   = "result-hero " + (isNormal ? "normal" : "abnormal");
       document.getElementById("resultIcon").textContent  = isNormal ? "✅" : "⚠️";
       document.getElementById("resultLabel").textContent = isNormal ? "정상 보행" : "이상 보행 의심";
       document.getElementById("resultConf").textContent  = `신뢰도 ${isNormal ? normalP : abnormalP}%`;
-
       document.getElementById("normalPct").textContent   = normalP + "%";
       document.getElementById("abnormalPct").textContent = abnormalP + "%";
       document.getElementById("framesNote").textContent  = `분석 프레임 수 · ${data.frames_analyzed}`;
 
-      resultDiv.style.display = "block";
+      resultCards.style.display = "flex";
+      resultCards.style.flexDirection = "column";
+      resultCards.style.gap = "16px";
+
       requestAnimationFrame(() => {
         document.getElementById("normalBar").style.width   = normalP + "%";
         document.getElementById("abnormalBar").style.width = abnormalP + "%";
+      });
+
+      // GradCAM
+      if (data.gradcam_b64) {
+        document.getElementById("gradcamImg").src = "data:image/jpeg;base64," + data.gradcam_b64;
+      }
+
+      // 프레임별 신뢰도 그래프
+      if (data.frame_normal_probs) {
+        drawChart(data.frame_normal_probs, isNormal);
+        const n = data.frame_normal_probs.length;
+        document.getElementById("chartMidLabel").textContent = `Frame ${Math.round(n/2)}`;
+        document.getElementById("chartEndLabel").textContent = `Frame ${n}`;
+      }
+    }
+
+    function drawChart(probs, isNormal) {
+      const canvas = document.getElementById("confChart");
+      const dpr    = window.devicePixelRatio || 1;
+      const W      = canvas.offsetWidth  || 432;
+      const H      = 160;
+      canvas.width  = W * dpr;
+      canvas.height = H * dpr;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+
+      const pad = { top: 12, right: 12, bottom: 8, left: 36 };
+      const cW  = W - pad.left - pad.right;
+      const cH  = H - pad.top  - pad.bottom;
+
+      // 배경
+      ctx.fillStyle = "rgba(255,255,255,0.02)";
+      ctx.roundRect(0, 0, W, H, 10);
+      ctx.fill();
+
+      // 0.5 기준선
+      const midY = pad.top + cH * 0.5;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = "rgba(255,255,255,0.1)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, midY);
+      ctx.lineTo(W - pad.right, midY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Y축 레이블
+      ctx.fillStyle = "#475569";
+      ctx.font = "10px Inter, sans-serif";
+      ctx.textAlign = "right";
+      ["1.0", "0.5", "0.0"].forEach((label, i) => {
+        const y = pad.top + cH * (i * 0.5);
+        ctx.fillText(label, pad.left - 6, y + 4);
+      });
+
+      // 그라디언트 채우기
+      const toX = (i) => pad.left + (i / (probs.length - 1)) * cW;
+      const toY = (v) => pad.top  + (1 - v) * cH;
+
+      const grad = ctx.createLinearGradient(0, pad.top, 0, H);
+      if (isNormal) {
+        grad.addColorStop(0,   "rgba(16,185,129,0.35)");
+        grad.addColorStop(1,   "rgba(16,185,129,0)");
+      } else {
+        grad.addColorStop(0,   "rgba(239,68,68,0.35)");
+        grad.addColorStop(1,   "rgba(239,68,68,0)");
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(toX(0), toY(probs[0]));
+      probs.forEach((v, i) => { if (i > 0) ctx.lineTo(toX(i), toY(v)); });
+      ctx.lineTo(toX(probs.length - 1), H - pad.bottom);
+      ctx.lineTo(toX(0), H - pad.bottom);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // 선
+      ctx.beginPath();
+      ctx.moveTo(toX(0), toY(probs[0]));
+      probs.forEach((v, i) => { if (i > 0) ctx.lineTo(toX(i), toY(v)); });
+      ctx.strokeStyle = isNormal ? "#34d399" : "#f87171";
+      ctx.lineWidth   = 2;
+      ctx.lineJoin    = "round";
+      ctx.stroke();
+
+      // 점
+      probs.forEach((v, i) => {
+        ctx.beginPath();
+        ctx.arc(toX(i), toY(v), 3, 0, Math.PI * 2);
+        ctx.fillStyle = isNormal ? "#34d399" : "#f87171";
+        ctx.fill();
       });
     }
 
@@ -518,9 +571,9 @@
 
     resetBtn.addEventListener("click", () => {
       selectedFile = fileInput.value = null;
-      fileName.innerHTML      = "";
-      submitBtn.disabled      = true;
-      resultDiv.style.display = errorBox.style.display = "none";
+      fileName.innerHTML = "";
+      submitBtn.disabled = true;
+      resultCards.style.display = errorBox.style.display = "none";
       document.getElementById("normalBar").style.width   = "0%";
       document.getElementById("abnormalBar").style.width = "0%";
     });
