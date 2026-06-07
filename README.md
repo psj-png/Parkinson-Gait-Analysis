@@ -17,25 +17,33 @@ Optical Flow + CNN (ResNet-18) + Grad-CAM 기반 보행 이상 이진 분류 파
 
 ```
 data/
-  01_Normal/          원본 정상 보행 영상 (41개)
-  02_Abnormal/        원본 이상 보행 영상 (32개)
+  01_Normal/              원본 정상 보행 영상 (41개)
+  02_Abnormal/            원본 이상 보행 영상 (32개)
 
 output/
-  optical_flow/       Step 1 — Farneback Optical Flow 이미지
-    Normal/             영상당 30프레임 × 41개
-    Abnormal/           영상당 30프레임 × 32개
-  models/             Step 2 — 학습된 가중치 (cnn_best.pth)
+  optical_flow/           Step 1 — Farneback Optical Flow 이미지
+    Normal/                 영상당 30프레임 × 41개
+    Abnormal/               영상당 30프레임 × 32개
+  models/                 Step 2 — 학습된 가중치 (cnn_best.pth)
   results/
-    gradcam/          Step 3 — Grad-CAM 히트맵 샘플 (클래스별 5장)
-    diagnosis_*.json  Step 4 — 진단 리포트 (JSON)
+    gradcam/              Step 3 — Grad-CAM 히트맵 샘플 (클래스별 5장)
+    diagnosis_*.json      Step 4 — 진단 리포트 (JSON)
+  demo/                   데모 영상 (GIF)
 
 src/
   01_extract_optical_flow.py
+  01b_extract_optical_flow_crop.py
   02_train_cnn.py
   03_gradcam.py
   04_diagnosis.py
+  05_confusion_matrix.py
+  06_gradcam_gif.py
+  app.py                  Flask 웹 데모 서버
 
-archive/              이전 파이프라인 파일 백업
+templates/
+  index.html              웹 데모 UI
+
+archive/                  이전 파이프라인 파일 백업
 ```
 
 ## 실행 순서
@@ -250,12 +258,20 @@ MediaPipe Pose로 사람 영역만 crop해 배경을 제거한 후 재학습한 
 - PyTorch 2.12 (CPU)
 - torchvision 0.27
 - scikit-learn 1.x
+- Flask 3.x
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-pip install opencv-python numpy scikit-learn
+pip install opencv-python numpy scikit-learn flask
+```
+
+### Flask 웹 데모 실행
+
+```bash
+python src/app.py
+# http://localhost:5000 접속
 ```
 
 ## 한계점
