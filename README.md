@@ -115,7 +115,7 @@ python src/app.py
 
 | Normal 보행 | Abnormal 보행 |
 |:-----------:|:-------------:|
-| <video src="output/demo/demo_Normal.mp4" width="340" controls></video> | <video src="output/demo/demo_Abnormal.mp4" width="340" controls></video> |
+| ![Normal](output/demo/demo_Normal.gif) | ![Abnormal](output/demo/demo_Abnormal.gif) |
 
 **주요 기능:**
 - 영상 드래그앤드롭 업로드
