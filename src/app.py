@@ -153,13 +153,19 @@ def run_diagnosis(video_path: Path) -> dict:
     heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
     overlay = cv2.addWeighted(resized, 0.55, heatmap, 0.45, 0)
 
+    # Optical Flow 프레임 30장 → 200×200 썸네일로 base64 인코딩
+    flow_frames_b64 = [
+        frame_to_b64(cv2.resize(f, (200, 200)), quality=65)
+        for f in flow_frames
+    ]
+
     return {
-        "prediction":        prediction,
-        "confidence":        {c: float(f"{mean_probs[i]:.4f}") for i, c in enumerate(CLASSES)},
-        "frames_analyzed":   len(flow_frames),
+        "prediction":         prediction,
+        "confidence":         {c: float(f"{mean_probs[i]:.4f}") for i, c in enumerate(CLASSES)},
+        "frames_analyzed":    len(flow_frames),
         "frame_normal_probs": frame_normal_probs,
-        "gradcam_b64":       frame_to_b64(overlay),
-        "flow_thumb_b64":    frame_to_b64(cv2.resize(best_bgr, (IMG_SIZE, IMG_SIZE))),
+        "gradcam_b64":        frame_to_b64(overlay),
+        "flow_frames_b64":    flow_frames_b64,
     }
 
 
