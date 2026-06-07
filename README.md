@@ -104,6 +104,25 @@ python src/04_diagnosis.py --video <영상 경로>
 - 입력 영상 → Optical Flow 추출 → 30프레임 평균 추론 → JSON 리포트 저장
 - 결과: `output/results/diagnosis_<영상명>.json`
 
+## Flask 웹 데모
+
+Optical Flow 추출 → 프레임별 추론 → GradCAM 히트맵 + 신뢰도 그래프를 실시간으로 시각화하는 모바일 친화적 웹 데모.
+
+```bash
+python src/app.py
+# http://localhost:5000 접속
+```
+
+| Normal 보행 | Abnormal 보행 |
+|:-----------:|:-------------:|
+| <video src="output/demo/demo_Normal.mp4" width="340" controls></video> | <video src="output/demo/demo_Abnormal.mp4" width="340" controls></video> |
+
+**주요 기능:**
+- 영상 드래그앤드롭 업로드
+- Optical Flow 30프레임 슬라이드쇼 재생
+- 프레임별 Normal 확률 그래프 실시간 시각화
+- Grad-CAM 히트맵으로 모델 주목 영역 확인
+
 ## 전체 데이터셋 진단 결과
 
 > `04_diagnosis.py`로 전체 73개 영상 진단
