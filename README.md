@@ -1,5 +1,10 @@
 # Gait Analysis — Normal vs Abnormal Classification
 
+![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.12-ee4c2c?logo=pytorch)
+![Flask](https://img.shields.io/badge/Flask-3.x-black?logo=flask)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 ## 프로젝트 소개
 
 파킨슨병을 비롯한 뇌 질환은 조기 발견이 치료 결과를 크게 좌우한다. 파킨슨병의 대표적인 초기 증상 중 하나가 보행 이상이지만, 환자 스스로 이를 인지하고 병원을 찾기까지 평균 수년이 걸린다.
@@ -7,6 +12,22 @@
 이 프로젝트의 출발점은 **"스마트폰 카메라만으로 보행 이상을 조기에 감지해 환자가 더 빨리 병원을 찾도록 돕는 것"** 이었다. 초기에는 파킨슨 확진 환자의 보행 영상을 직접 학습 데이터로 활용하려 했으나, 공개된 파킨슨 보행 영상 데이터셋이 전 세계적으로 극히 부족해 현실적으로 불가능했다. 이에 **정상 보행 vs 이상 보행 이진 분류**로 목표를 전환하여, 이상 보행이 감지될 경우 조기 검진을 권고하는 방향으로 프로젝트를 설계했다.
 
 Optical Flow + ResNet-18 CNN + Grad-CAM 기반 보행 이상 이진 분류 파이프라인.
+
+## 파이프라인 아키텍처
+
+```mermaid
+flowchart LR
+    A[🎬 보행 영상] --> B[Optical Flow 추출\nFarneback]
+    B --> C[HSV 프레임\n30장]
+    C --> D[ResNet-18\nFine-tuning]
+    D --> E{분류}
+    E -->|Normal| F[✅ 정상 보행]
+    E -->|Abnormal| G[⚠️ 이상 보행 의심]
+    D --> H[Grad-CAM\n주목 영역 시각화]
+    H --> I[🌐 Flask 웹 데모]
+    F --> I
+    G --> I
+```
 
 ## 파이프라인 완료 현황
 
